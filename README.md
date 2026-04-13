@@ -17,17 +17,45 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommenders like Spotify or YouTube learn from massive amounts of behavior data — what you skip, replay, or add to a playlist — and use that history to predict what you'll want next. This simulation takes a simpler, more transparent approach: instead of learning from behavior, it matches songs directly against an explicit user taste profile using a weighted scoring formula. The goal is to prioritize **interpretability** over accuracy — every recommendation can be explained by pointing to the exact features that drove the score.
 
-Some prompts to answer:
+### Song Features
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Each `Song` object stores the following attributes from `data/songs.csv`:
 
-You can include a simple diagram or bullet list if helpful.
+- `genre` — categorical style label (e.g. pop, lofi, rock, jazz, synthwave)
+- `mood` — emotional quality (e.g. happy, chill, intense, relaxed, focused, moody)
+- `energy` — float from 0 to 1, how energetic the track feels
+- `tempo_bpm` — beats per minute
+- `valence` — float from 0 to 1, musical positiveness
+- `danceability` — float from 0 to 1, how suitable the track is for dancing
+- `acousticness` — float from 0 to 1, how acoustic (vs. electronic) the track sounds
+
+### UserProfile Features
+
+Each `UserProfile` captures four preference signals:
+
+- `favorite_genre` — the genre the user most wants to hear
+- `favorite_mood` — the mood the user is currently seeking
+- `target_energy` — their preferred energy level, as a float from 0 to 1
+- `likes_acoustic` — boolean flag for whether they prefer acoustic over electronic sounds
+
+### Algorithm Recipe
+
+Each song is scored by four rules, summed into a total (max 5.0), then ranked:
+
+- **Genre match** — `+2.0` if genre matches, else `0`
+- **Mood match** — `+1.0` if mood matches, else `0`
+- **Energy proximity** — `1.5 × (1.0 − |song.energy − target_energy|)`
+- **Acoustic bonus** — `+0.5` if `(acousticness >= 0.6) == likes_acoustic`, else `0`
+
+The top `k` songs by total score are returned as recommendations.
+
+### Potential Biases
+
+- Genre carries 40% of the max score, so songs that miss on genre rarely surface even with strong mood and energy matches.
+- Genre and mood are correlated in this catalog (e.g. every rock song is "intense"), so those two rules can double-count the same signal.
+- No diversity control — the same artist can fill multiple top slots.
 
 ---
 
@@ -53,6 +81,11 @@ pip install -r requirements.txt
 ```bash
 python -m src.main
 ```
+
+## Terminal Output
+
+![alt text](image.png)
+
 
 ### Running Tests
 
