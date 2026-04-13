@@ -1,111 +1,73 @@
 # 🎧 Model Card: Music Recommender Simulation
 
-## 1. Model Name  
-
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+## 1. Model Name
+VibeFinder 1.0
 
 ---
 
-## 2. Intended Use  
-
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+## 2. Intended Use
+Suggests the top 5 songs matching a user's taste profile (genre, mood, 
+energy). Built for a CodePath AI course — not for real users or production.
 
 ---
 
-## 3. How the Model Works  
+## 3. How the Model Works
+Each song gets a score based on how well it matches the user's preferences:
+- Genre match = most points
+- Mood match = moderate points  
+- Energy closeness = partial points (closer = higher score)
+- Acoustic preference = small bonus
 
-Explain your scoring approach in simple language.  
-
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+Songs are sorted by score and the top 5 are returned.
 
 ---
 
-## 4. Data  
-
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+## 4. Data
+- 15 songs in CSV format
+- Features: genre, mood, energy, tempo, valence, danceability, acousticness
+- Manually created — no real listening history
+- Missing genres: classical, R&B, hip-hop, country
 
 ---
 
-## 5. Strengths  
-
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+## 5. Strengths
+Works well when user preferences match the dataset. Chill Lofi and 
+Intense Rock profiles both returned accurate, intuitive results. Energy 
+similarity gives partial credit rather than a simple pass/fail, which 
+makes scoring feel more natural.
 
 ---
 
-## 6. Limitations and Bias 
-
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+## 6. Limitations and Bias
+Genre weight (2.0) is so dominant that a weak genre match beats a 
+perfect mood and energy match in a different genre. The Conflicted 
+Listener profile (rock/sad) scored 0 mood points for every song 
+because that combination doesn't exist in the dataset. The system 
+also has no memory and cannot learn from feedback.
 
 ---
 
-## 7. Evaluation  
+## 7. Evaluation
 
-How you checked whether the recommender behaved as expected. 
+Tested four profiles: Intense Rock, High-Energy Pop, Chill Lofi, 
+and Conflicted Listener. Also ran a weight-shift experiment (halved 
+genre, doubled energy) which noticeably changed rankings and showed 
+how sensitive the system is to small design choices.
 
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+![Terminal output - Intense Rock and High-Energy Pop profiles](image-2.png)
+![Terminal output - Chill Lofi and Conflicted Listener profiles](image-1.png)
 
 ---
 
-## 8. Future Work  
-
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+## 8. Future Work
+1. Expand to 100+ songs covering more genres
+2. Add collaborative filtering using simulated user data
+3. Build a feedback loop so weights adjust based on user ratings
 
 ---
 
-## 9. Personal Reflection  
-
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+## 9. Personal Reflection
+The Conflicted Listener result was the biggest surprise — the algorithm 
+was doing exactly what the math said, but the output was useless because 
+the data didn't support that preference combination. This changed how I 
+think about apps like Spotify. The math is simple. The data is everything.
